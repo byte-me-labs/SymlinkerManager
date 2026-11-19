@@ -87,6 +87,26 @@ func TestActionMenuListsRowCommands(t *testing.T) {
 	}
 }
 
+func TestSelectAllLeavesConflictsUnchecked(t *testing.T) {
+	a := newTestApp(
+		[]config.Link{
+			{Name: "待创建", Source: `D:\data\a`, Target: `C:\links\a`},
+			{Name: "冲突", Source: `D:\data\b`, Target: `C:\links\b`},
+		},
+		[]scan.Result{
+			{Index: 0, Status: scan.StatusMissing},
+			{Index: 1, Status: scan.StatusConflict},
+		},
+	)
+	for i := range a.checked {
+		a.checked[i] = false
+	}
+	a.selectAll(true)
+	if !a.checked[0] || a.checked[1] {
+		t.Fatalf("全选只应勾选可批量处理的条目: %v", a.checked)
+	}
+}
+
 func TestCreateRequestNeedsActionableRow(t *testing.T) {
 	a := newTestApp(
 		[]config.Link{

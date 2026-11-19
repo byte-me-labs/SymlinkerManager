@@ -221,9 +221,11 @@ func (a *App) selectAll(on bool) {
 			a.checked[i] = false
 			continue
 		}
+		// Conflicts must be renamed before they can be created, so selecting
+		// them would only produce skips.
 		switch res.Status {
 		case scan.StatusOK, scan.StatusMissing, scan.StatusReplaceable,
-			scan.StatusConflict, scan.StatusSourceMissing:
+			scan.StatusSourceMissing:
 			a.checked[i] = true
 		default:
 			a.checked[i] = false
@@ -1104,7 +1106,7 @@ func (a *App) alerts(c *ui.Context) {
 		if a.renameIndex >= 0 && a.renameIndex < len(a.cfg.Links) {
 			name = a.cfg.Links[a.renameIndex].Name
 		}
-		msg := "只把该目录重命名为带时间戳的名称，不创建链接，也不会删除其中的文件。\n\n" +
+		msg := "只把该目标重命名为带时间戳的名称，不创建链接，也不会删除任何数据。\n\n" +
 			name + "\n" + res.Target + "\n\n重命名后该条目变为「待创建」，可再执行创建。"
 		if ui.AlertDialog(c, &a.confirmRename, "重命名原目标？", msg, "取消", "重命名") == 1 {
 			a.doRename()

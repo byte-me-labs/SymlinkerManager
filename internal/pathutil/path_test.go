@@ -19,6 +19,7 @@ func TestExpandEnv(t *testing.T) {
 		{`$SLM_TEST_ROOT\data`, `C:\Data Disk\data`},
 		{`${SLM_TEST_ROOT}\data`, `C:\Data Disk\data`},
 		{`%SLM_TEST_UNKNOWN%\data`, `%SLM_TEST_UNKNOWN%\data`},
+		{`C:\data$literal`, `C:\data$literal`},
 		{`100%%done`, `100%%done`},
 	}
 	for _, tt := range tests {

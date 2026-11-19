@@ -10,12 +10,19 @@ import (
 )
 
 // ExpandEnv expands both Windows-style %VAR% and Go-style $VAR/${VAR}
-// environment variables. Unknown %VAR% tokens are left untouched so that the
-// caller can report a useful validation error instead of silently producing a
-// shortened path.
+// environment variables. Unknown tokens are left untouched so that the caller
+// can report a useful validation error instead of silently producing a
+// shortened path; "$" is also a legal character in a Windows path.
 func ExpandEnv(s string) string {
 	s = expandPercent(s)
-	return os.Expand(s, os.Getenv)
+	return os.Expand(s, func(name string) string {
+		if v, ok := os.LookupEnv(name); ok {
+			return v
+		}
+		// Keep the literal token instead of dropping it. shortcut: ${VAR}
+		// comes back as $VAR, upgrade if the exact spelling must survive.
+		return "$" + name
+	})
 }
 
 func expandPercent(s string) string {
